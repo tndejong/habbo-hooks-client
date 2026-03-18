@@ -53,11 +53,10 @@ Cursor (paste into `~/.cursor/mcp.json`):
 
 Claude Code:
 
-- Open Claude Code and run `/mcp`
-- Add an HTTP MCP server with:
-  - Name: `hotel-mcp`
-  - URL: `https://hotel-mcp.fixdev.nl/mcp`
-  - Header: `Authorization: Bearer <your-pro-token>`
+```bash
+claude mcp add --transport http hotel-mcp https://hotel-mcp.fixdev.nl/mcp \
+  -H "Authorization: Bearer <your-pro-token>"
+```
 
 ## Folder layout
 
