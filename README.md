@@ -2,22 +2,76 @@
 
 Remote-first hook installer for both Claude Code and Cursor.
 
-- Hook runner: `hooks/habbo-agent-platform-hook.sh`
-- Relay runtime: `hooks/relay_hook.mjs`
+This repo is the fast path: install hooks, set your token, and start showing your own agents/subagents in the hosted retro hotel.
+
+- Hook runner: `habbo-agent-platform-hook.sh`
+- Relay runtime: `relay_hook.mjs`
+
+## Quickstart (Hosted Fast Path)
+
+Build and show your own agents/subagents in the hosted retro hotel quickly:
+
+1. Register at [https://hotel-portal.fixdev.nl](https://hotel-portal.fixdev.nl)
+2. Request Pro tier and copy your MCP token
+3. Clone this repo and run one installer command
+
+```bash
+git clone https://github.com/tndejong/habbo-hooks-client.git
+cd habbo-hooks-client
+
+# set once in your shell session
+export HABBO_HOOK_TRANSPORT=remote
+export MCP_API_KEY="<your-pro-token>"
+
+# Claude hooks
+bash ./claude/install.sh
+
+# Cursor hooks
+bash ./cursor/install.sh
+```
+
+Done. Hooks now post events to the hosted MCP endpoint so your agent behavior can show in-hotel without running the full stack locally.
+
+## MCP connection snippet (required)
+
+You also need to connect your IDE to the hosted MCP server.
+
+Cursor (paste into `~/.cursor/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "hotel-mcp": {
+      "url": "https://hotel-mcp.fixdev.nl/mcp",
+      "headers": {
+        "Authorization": "Bearer <your-pro-token>"
+      }
+    }
+  }
+}
+```
+
+Claude Code:
+
+- Open Claude Code and run `/mcp`
+- Add an HTTP MCP server with:
+  - Name: `hotel-mcp`
+  - URL: `https://hotel-mcp.fixdev.nl/mcp`
+  - Header: `Authorization: Bearer <your-pro-token>`
 
 ## Folder layout
 
-Global/shared hook runtime files stay in `hooks/`:
+Global/shared hook runtime files:
 
-- `hooks/habbo-agent-platform-hook.sh`
-- `hooks/relay_hook.mjs`
-- `hooks/manage_hooks.mjs`
+- `habbo-agent-platform-hook.sh`
+- `relay_hook.mjs`
+- `manage_hooks.mjs`
 
 App-specific installer scripts are separated by domain:
 
-- `hooks/claude/`
-- `hooks/cursor/`
-- `hooks/openclaw/` (reserved for upcoming support)
+- `claude/`
+- `cursor/`
+- `openclaw/` (reserved for upcoming support)
 
 ## Applications and event differences
 
@@ -65,37 +119,31 @@ Cursor -> internal event:
 Install only Claude:
 
 ```bash
-bash hooks/claude/install.sh
-just hooks-install claude
+bash ./claude/install.sh
 ```
 
 Install only Cursor:
 
 ```bash
-bash hooks/cursor/install.sh
-just hooks-install cursor
+bash ./cursor/install.sh
 ```
 
 Install both:
 
 ```bash
-just hooks-install
+bash ./install.sh
 ```
 
 Status:
 
 ```bash
-just hooks-status
-just hooks-status claude
-just hooks-status cursor
+bash ./status.sh
 ```
 
 Uninstall:
 
 ```bash
-just hooks-uninstall
-just hooks-uninstall claude
-just hooks-uninstall cursor
+bash ./uninstall.sh
 ```
 
 Restart the relevant app after install/uninstall.
@@ -126,13 +174,15 @@ Remote-first defaults:
 ```bash
 HABBO_HOOK_TRANSPORT=remote
 HABBO_HOOK_REMOTE_BASE_URL=https://hotel-mcp.fixdev.nl
-HABBO_HOOK_REMOTE_TOKEN=<your-token>
+MCP_API_KEY=<your-token>
 ```
 
 Notes:
 
-- `HABBO_HOOK_REMOTE_TOKEN` falls back to `MCP_API_KEY` when unset.
+- `MCP_API_KEY` is used as the bearer token for hosted hook events.
+- `HABBO_HOOK_REMOTE_TOKEN` is optional and only needed if you want a separate hook token override.
 - `HABBO_HOOK_REMOTE_BASE_URL` falls back to `HABBO_HOOK_MCP_BASE_URL`.
+- Ensure token env vars are available to your IDE process (set in your shell profile and restart the IDE).
 - for local mode, `HABBO_HOOK_ENABLED=true` must be set in `habbo-mcp/.env`.
 
 ## Safety and behavior

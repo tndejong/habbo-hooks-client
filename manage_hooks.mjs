@@ -106,6 +106,19 @@ function saveSettings(settingsPath, settings) {
   fs.writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`, 'utf8');
 }
 
+function resolveHooksDir(repoRoot) {
+  const candidates = [path.resolve(repoRoot, 'hooks'), path.resolve(repoRoot)];
+  for (const dir of candidates) {
+    const runner = path.resolve(dir, 'habbo-agent-platform-hook.sh');
+    if (fs.existsSync(runner)) {
+      return dir;
+    }
+  }
+  throw new Error(
+    `Unable to locate habbo-agent-platform-hook.sh from repo root: ${repoRoot}.`
+  );
+}
+
 function findClaudeBlock(blocks, needsMatcher) {
   if (!Array.isArray(blocks)) {
     return null;
@@ -366,7 +379,7 @@ function printStatus(result, settingsPath, hookRunnerPath, target) {
 
 function main() {
   const { command, target, repoRoot, settingsPath } = parseArgs(process.argv);
-  const scriptDir = path.resolve(repoRoot, 'hooks');
+  const scriptDir = resolveHooksDir(repoRoot);
   const hookRunnerPath = path.resolve(scriptDir, 'habbo-agent-platform-hook.sh');
   const settings = ensureSettings(settingsPath, target);
 
