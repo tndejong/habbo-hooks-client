@@ -149,29 +149,31 @@ Restart the relevant app after install/uninstall.
 
 ## Mode overview
 
-### Recommended mode: remote (default)
+### Recommended mode: auto (default)
 
-- `HABBO_HOOK_TRANSPORT=remote` (default)
+- `HABBO_HOOK_TRANSPORT=auto`
+- tries remote first, falls back to local if remote is unavailable
+- works for both hosted and self-hosted setups without any changes
+- best choice if you are unsure which setup you are using
+
+### Remote mode
+
+- `HABBO_HOOK_TRANSPORT=remote`
 - relay posts events to `https://hotel-mcp.fixdev.nl/hooks/events`
 - no local `habbo-mcp` runtime required
+- use this if you only use the hosted hotel and never run locally
 
-### Expert mode: local
+### Local mode
 
 - `HABBO_HOOK_TRANSPORT=local`
 - relay runs local `habbo-mcp/src/hooks/habboAgentHook.ts`
 - requires local repo + dependencies
-
-### Fallback mode: auto
-
-- `HABBO_HOOK_TRANSPORT=auto`
-- tries remote first, then local
+- use this if you only run the full stack locally
 
 ## Environment variables
 
-Remote-first defaults:
-
 ```bash
-HABBO_HOOK_TRANSPORT=remote
+HABBO_HOOK_TRANSPORT=auto
 HABBO_HOOK_REMOTE_BASE_URL=https://hotel-mcp.fixdev.nl
 MCP_API_KEY=<your-token>
 ```
